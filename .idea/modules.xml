@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/expert-lamp.iml" filepath="$PROJECT_DIR$/.idea/expert-lamp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scraper/scraper.iml" filepath="$PROJECT_DIR$/scraper/scraper.iml" />
     </modules>
   </component>
 </project>
