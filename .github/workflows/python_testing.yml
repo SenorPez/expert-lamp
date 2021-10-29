@@ -25,4 +25,4 @@ jobs:
                     
       - name: Test With `nose2`
         run: |
-          nose2
+          nose2 --start-dir ./scraper
