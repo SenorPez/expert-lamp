@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import sentinel
 
-from src.my_gw2api.commerce import Price
+from src.my_gw2api.commerce import Price, Prices
 
 
 def mocked_requests_get(*args, **kwargs):
@@ -44,6 +44,7 @@ class TestPrice(unittest.TestCase):
                                          id(sentinel.sells_unit_price))
         mock_get.return_value = mocked_requests_get(json_data=json_data)
         instance = Price(id(sentinel.item_id))
+        test = Prices([34, 35])
         expected_value = Price
         self.assertIsInstance(instance, expected_value)
 

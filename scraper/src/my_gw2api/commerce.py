@@ -2,7 +2,7 @@
 
 """
 import requests
-
+from urllib.parse import urlunsplit, urlencode
 
 class Price:
     """Represents aggregated buy and sell listing information.
@@ -25,3 +25,23 @@ class Price:
         self.buys_unit_price = req_json['buys']['unit_price']
         self.sells_quantity = req_json['sells']['quantity']
         self.sells_unit_price = req_json['sells']['unit_price']
+
+
+class Prices:
+    """Represents aggregated buy and sell listing information in
+    an array of Price objects
+    API Endpoint: /v2/commerce/prices/<item_ids>
+
+    Arguments:
+        item_ids - Array of item IDs.
+
+    """
+
+    scheme = "https"
+    host = "api.guildwars2.com"
+    endpoint = "/v2/commerce/prices/prices"
+
+    def __init__(self, item_ids):
+        query = urlencode({'ids': ",".join(map(str, item_ids))})
+        thing = urlunsplit((self.scheme, self.host, self.endpoint, query, ""))
+        g = thing
