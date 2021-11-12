@@ -1,4 +1,4 @@
-"""Provides classes for using commerce endpoints for the Guild Wars 2 API
+"""Provides a class for using the items endpoint for the Guild Wars 2 API
 
 """
 from typing import TypeVar, Generator
@@ -9,13 +9,13 @@ import requests
 T = TypeVar('T')
 
 
-class Prices:
-    """Represents aggregated buy and sell listing information from the trading post.
-    API Endpoint: /v2/commerce/prices/<item_ids>
+class Items:
+    """Represents items discovered in the game.
+    API Endpoint: /v2/items?id=<item_ids>
     """
     scheme = "https"
     host = "api.guildwars2.com"
-    endpoint = "/v2/commerce/prices"
+    endpoint = "/v2/items"
 
     def __init__(self, item_ids: list[int] = None) -> None:
         """Initializes class
@@ -32,14 +32,13 @@ class Prices:
 
             self.values = []
             for chunk in chunked_item_ids:
-                print(chunk)
                 self.values.extend(self.get_api_data(request_url, chunk))
 
         else:
             self.values = self.get_api_data(request_url, item_ids)
 
     @staticmethod
-    def chunk_array(array: list[T], chunk_length: int) -> Generator[list[T]]:
+    def chunk_array(array: list[T], chunk_length: int) -> Generator[list[T], None, None]:
         """Returns a series of arrays of chunk_length or less length.
 
         :param array: Input array
