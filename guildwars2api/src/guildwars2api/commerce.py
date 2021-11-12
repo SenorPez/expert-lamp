@@ -1,11 +1,8 @@
-"""Provides classes for using commerce endpoints for the Guild Wars 2 API
+"""Provides classes for using commerce endpoints from the Guild Wars 2 API
 
 """
-from typing import TypeVar
 
 from guildwars2api.endpoint import Endpoint
-
-T = TypeVar('T')
 
 
 class Prices(Endpoint):

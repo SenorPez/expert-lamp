@@ -1,11 +1,8 @@
-"""Provides a class for using the items endpoint for the Guild Wars 2 API
+"""Provides a class for using the items endpoint from the Guild Wars 2 API
 
 """
-from typing import TypeVar
 
 from guildwars2api.endpoint import Endpoint
-
-T = TypeVar('T')
 
 
 class Items(Endpoint):

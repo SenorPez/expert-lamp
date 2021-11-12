@@ -44,7 +44,13 @@ class Endpoint:
             yield array[i:i + chunk_length]
 
     @staticmethod
-    def get_api_data(url: str, item_ids: list[int]) -> dict:
+    def get_api_data(url: str, item_ids: list[int]) -> list:
+        """Gets data from the Guild Wars 2 API.
+
+        :param url: API resource URL
+        :param item_ids: List of item IDs to retrieve
+        :return: List containing JSON dict resources
+        """
         params = {"ids": ",".join(map(str, item_ids))}
         req = requests.get(url, params=params)
         req.raise_for_status()
