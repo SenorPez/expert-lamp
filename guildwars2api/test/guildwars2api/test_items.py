@@ -102,3 +102,7 @@ class TestItems(unittest.TestCase):
         mock_get.assert_has_calls([call(url), call(url, params=params)])
 
     #TODO: Test various item type structures
+
+
+if __name__ == '__main__':
+    unittest.main()

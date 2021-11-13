@@ -56,3 +56,7 @@ class TestMaterials(unittest.TestCase):
         mock_get.assert_has_calls([call(url), call(url, params=params)])
 
     # TODO: Test data types for fields.
+
+
+if __name__ == '__main__':
+    unittest.main()
