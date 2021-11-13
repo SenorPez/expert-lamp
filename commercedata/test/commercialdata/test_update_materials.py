@@ -1,31 +1,31 @@
 import unittest
 from unittest import mock
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
-from src.commercedata.update_materials import connect, update
+from src.commercedata.update_materials import update
 
 
 class TestUpdateMaterials(unittest.TestCase):
-    @mock.patch('src.commercedata.update_materials.MongoClient')
-    def test_connect(self, mock_mongo_client):
-        _ = connect('expert-lamp')
-        mock_mongo_client.assert_called_with('mongodb://localhost:27017/expert-lamp')
-
     @mock.patch('src.commercedata.update_materials.Materials')
-    def test_update(self, mock_materials):
+    @mock.patch('src.commercedata.update_materials.Database')
+    def test_update(self, mock_database, mock_materials):
+        mock_init_database = MagicMock()
+        mock_database.return_value = mock_init_database
+
         materials = [
             {"id": 1, "name": "Alpha"},
             {"id": 2, "name": "Beta"}]
         mock_materials.return_value.configure_mock(values=materials)
 
-        mock_collection = MagicMock()
-        mock_database = {'materials': mock_collection}
-        update(mock_database)
+        update()
 
-        mock_collection.find_one_and_replace.assert_has_calls([
-            call({"id": 1}, materials[0], upsert=True),
-            call({"id": 2}, materials[1], upsert=True)
-        ])
+        mock_database.assert_called_with()
+        mock_init_database.connect.assert_called_with('expert-lamp')
+        mock_init_database.update.assert_called_with(
+            'materials',
+            [{"id": 1}, {"id": 2}],
+            materials
+        )
 
 
 if __name__ == '__main__':

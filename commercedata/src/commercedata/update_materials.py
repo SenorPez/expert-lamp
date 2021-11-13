@@ -1,26 +1,15 @@
-from pymongo import MongoClient
-
 from guildwars2api.materials import Materials
+from src.commercedata.database import Database
 
 
-def connect(dbname):
-    connection_string = "mongodb://localhost:27017/expert-lamp"
-    client = MongoClient(connection_string)
-    return client[dbname]
+def update():
+    database = Database()
+    database.connect('expert-lamp')
 
-
-def update(database):
-    collection = database['materials']
     materials = Materials()
-
-    for material in materials.values:
-        collection.find_one_and_replace(
-            {"id": material['id']},
-            material,
-            upsert=True)
-        pass
+    matches = [{"id": x['id']} for x in materials.values]
+    database.update('materials', matches, materials.values)
 
 
 if __name__ == "__main__":
-    database = connect('expert-lamp')
-    update(database)
+    update()
