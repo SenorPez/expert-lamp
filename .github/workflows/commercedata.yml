@@ -25,6 +25,7 @@ jobs:
           pip install tqdm
           pip install nose2
           pip install -e ./guildwars2api
+          pip install pymongo
                     
       - name: Test With `nose2`
         run: |
