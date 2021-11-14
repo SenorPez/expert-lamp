@@ -24,6 +24,7 @@ jobs:
           pip install requests
           pip install tqdm
           pip install nose2
+          pip install -e ./guildwars2api
                     
       - name: Test With `nose2`
         run: |
