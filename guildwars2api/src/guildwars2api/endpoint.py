@@ -5,6 +5,7 @@ from typing import Generator, TypeVar
 from urllib.parse import urlunsplit
 
 import requests
+from tqdm import tqdm
 
 T = TypeVar('T')
 
@@ -27,7 +28,7 @@ class Endpoint:
             chunked_item_ids = self.chunk_array(item_ids, 100)
 
             self.values = []
-            for chunk in chunked_item_ids:
+            for chunk in tqdm(chunked_item_ids, total=len(item_ids) // 100 + 1):
                 self.values.extend(self.get_api_data(request_url, chunk))
 
         else:

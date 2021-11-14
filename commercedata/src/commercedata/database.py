@@ -4,6 +4,7 @@
 import datetime
 
 from pymongo import MongoClient
+from tqdm import tqdm
 
 
 class Database:
@@ -23,7 +24,7 @@ class Database:
 
     def update(self, collection, matchers, values):
         collection = self.database[collection]
-        for (match, value) in zip(matchers, values):
+        for (match, value) in tqdm(zip(matchers, values)):
             collection.find_one_and_replace(
                 match,
                 value,

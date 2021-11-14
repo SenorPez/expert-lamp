@@ -22,7 +22,7 @@ class TestUpdateItems(unittest.TestCase):
         mock_database.assert_called_with()
         mock_init_database.connect.assert_called_with('expert-lamp')
         mock_init_database.update.assert_called_with(
-            'materials',
+            'items',
             [{"id": 1}, {"id": 2}],
             items
         )

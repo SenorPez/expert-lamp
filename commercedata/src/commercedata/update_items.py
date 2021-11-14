@@ -8,7 +8,7 @@ def update():
 
     items = Items()
     matches = [{"id": x['id']} for x in items.values]
-    database.update('materials', matches, items.values)
+    database.update('items', matches, items.values)
 
 
 if __name__ == "__main__":
