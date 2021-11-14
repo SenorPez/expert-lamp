@@ -19,7 +19,7 @@ def materials_resource(item_id,
 class TestMaterials(unittest.TestCase):
     """Unit tests against the Materials class"""
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init(self, mock_get):
         json_data = materials_resource(id(sentinel.item_id),
                                        id(sentinel.name),
@@ -34,7 +34,7 @@ class TestMaterials(unittest.TestCase):
         self.assertIsInstance(instance, expected_value)
         mock_get.assert_called_with(url, params=params)
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init_all(self, mock_get):
         json_ids = [id(sentinel.item_id_1), id(sentinel.item_id_2)]
         json_data_1 = materials_resource(id(sentinel.item_id_1),

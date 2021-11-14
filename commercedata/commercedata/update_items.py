@@ -1,5 +1,5 @@
 from guildwars2api.items import Items
-from src.commercedata.database import Database
+from commercedata.database import Database
 
 
 def update():

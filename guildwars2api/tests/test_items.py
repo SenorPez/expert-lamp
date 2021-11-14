@@ -30,7 +30,7 @@ def mock_item(item_id, chat_link=None, name=None, icon=None, description=None, i
 class TestItems(unittest.TestCase):
     """Unit tests against the Items class"""
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init(self, mock_get):
         json_data = mock_item(id(sentinel.item_id),
                               id(sentinel.chat_link),
@@ -57,7 +57,7 @@ class TestItems(unittest.TestCase):
         self.assertIsInstance(instance, expected_value)
         mock_get.assert_called_with(url, params=params)
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init_all(self, mock_get):
         json_ids = [id(sentinel.item_id_1), id(sentinel.item_id_2)]
         json_data_1 = mock_item(id(sentinel.item_id_1),

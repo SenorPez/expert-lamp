@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import sentinel, call
 
-from src.guildwars2api.commerce import Prices
+from guildwars2api.commerce import Prices
 from mocked_requests import mocked_requests_get
 
 
@@ -22,7 +22,7 @@ def mock_commerce_prices_item(item_id, whitelisted=True, buys_quantity=None, buy
 
 class TestPrices(unittest.TestCase):
     """Unit tests against the Prices class"""
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init(self, mock_get):
         json_data = mock_commerce_prices_item(id(sentinel.item_id), False, id(sentinel.buys_quantity),
                                               id(sentinel.buys_unit_price), id(sentinel.sells_quantity),
@@ -36,7 +36,7 @@ class TestPrices(unittest.TestCase):
         self.assertIsInstance(instance, expected_value)
         mock_get.assert_called_with(url, params=params)
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_init_all(self, mock_get):
         json_ids = [id(sentinel.item_id_1), id(sentinel.item_id_2)]
         json_data_1 = mock_commerce_prices_item(id(sentinel.item_id_1), False, id(sentinel.buys_quantity),
@@ -54,7 +54,7 @@ class TestPrices(unittest.TestCase):
         self.assertIsInstance(instance, expected_value)
         mock_get.assert_has_calls([call(url), call(url, params=params)])
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_values(self, mock_get):
         json_data = mock_commerce_prices_item(id(sentinel.item_id), False, id(sentinel.buys_quantity),
                                               id(sentinel.buys_unit_price), id(sentinel.sells_quantity),
@@ -78,7 +78,7 @@ class TestPrices(unittest.TestCase):
         self.assertEqual([x['sells']['unit_price'] for x in instance.values], expected_sells_unit_price)
         mock_get.assert_called_with(url, params=params)
 
-    @mock.patch('src.guildwars2api.endpoint.requests.get')
+    @mock.patch('guildwars2api.endpoint.requests.get')
     def test_values_all(self, mock_get):
         json_ids = [id(sentinel.item_id_1), id(sentinel.item_id_2)]
         json_data_1 = mock_commerce_prices_item(id(sentinel.item_id_1), False, id(sentinel.buys_quantity),

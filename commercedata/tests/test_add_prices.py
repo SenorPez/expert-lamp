@@ -2,12 +2,12 @@ import unittest
 from unittest import mock
 from unittest.mock import MagicMock
 
-from src.commercedata.add_prices import add
+from commercedata.add_prices import add
 
 
 class TestAddPrices(unittest.TestCase):
-    @mock.patch('src.commercedata.add_prices.Prices')
-    @mock.patch('src.commercedata.add_prices.Database')
+    @mock.patch('commercedata.add_prices.Prices')
+    @mock.patch('commercedata.add_prices.Database')
     def test_update(self, mock_database, mock_prices):
         mock_init_database = MagicMock()
         mock_database.return_value = mock_init_database

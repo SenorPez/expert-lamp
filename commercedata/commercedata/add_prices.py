@@ -1,5 +1,5 @@
 from guildwars2api.commerce import Prices
-from src.commercedata.database import Database
+from commercedata.database import Database
 
 
 def add():

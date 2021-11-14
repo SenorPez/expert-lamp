@@ -2,11 +2,11 @@ import unittest
 from unittest import mock
 from unittest.mock import MagicMock, call
 
-from src.commercedata.database import Database
+from commercedata.database import Database
 
 
 class TestDatabase(unittest.TestCase):
-    @mock.patch('src.commercedata.database.MongoClient')
+    @mock.patch('commercedata.database.MongoClient')
     def test_connect(self, mock_mongo_client):
         instance = Database()
         instance.connect('expert-lamp')
