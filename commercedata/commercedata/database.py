@@ -22,6 +22,9 @@ class Database:
         self.client = MongoClient(self.connection_string)
         self.database = self.client[dbname]
 
+    def get_collection(self, collection):
+        return self.database[collection]
+
     def update(self, collection, matchers, values):
         collection = self.database[collection]
         for (match, value) in tqdm(zip(matchers, values)):
