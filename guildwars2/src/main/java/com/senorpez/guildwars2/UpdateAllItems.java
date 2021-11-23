@@ -26,7 +26,7 @@ public class UpdateAllItems {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
 
-        Stream<Item> items = Item.getMultiple(Stream.of(28445, 28446));
+        Stream<Item> items = Item.getAll();
         items.forEach(item -> session.saveOrUpdate(new ItemEntity(item)));
         tx.commit();
 
