@@ -14,7 +14,8 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "item")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "material_id", updatable = false)
     private MaterialEntity material;
 
     public ItemEntity() {
@@ -29,23 +30,38 @@ public class ItemEntity {
         return id;
     }
 
-    public void setId(int id) {
+    public ItemEntity setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public ItemEntity setName(String name) {
         this.name = name;
+        return this;
     }
 
     public MaterialEntity getMaterial() {
         return material;
     }
 
-    public void setMaterial(MaterialEntity material) {
+    public ItemEntity setMaterial(MaterialEntity material) {
         this.material = material;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof final ItemEntity that)) return false;
+        return that.getId() == getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return ((Integer) getId()).hashCode();
     }
 }

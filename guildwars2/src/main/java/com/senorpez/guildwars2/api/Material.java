@@ -2,13 +2,13 @@ package com.senorpez.guildwars2.api;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Material {
     private final int id;
     private final String name;
-    private final List<Integer> itemIds = new ArrayList<>();
+    private final Set<Integer> itemIds = new HashSet<>();
 
     public Material(ObjectNode json) {
         this.id = json.get("id").asInt();
@@ -24,7 +24,7 @@ public class Material {
         return name;
     }
 
-    public List<Integer> getItemIds() {
+    public Set<Integer> getItemIds() {
         return itemIds;
     }
 }

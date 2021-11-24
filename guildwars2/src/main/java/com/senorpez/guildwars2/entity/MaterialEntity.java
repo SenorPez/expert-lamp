@@ -1,73 +1,82 @@
 package com.senorpez.guildwars2.entity;
 
+import com.senorpez.guildwars2.api.ItemBuilder;
 import com.senorpez.guildwars2.api.Material;
 
 import javax.persistence.*;
-import java.util.List;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "materials")
 public class MaterialEntity {
+    @Id
     @Column(nullable = false)
     private int id;
 
     @Column(nullable = false)
     private String name;
 
-    @Id
-    @Column(name = "item_id", nullable = false)
-    private int itemId;
-
-    @OneToOne(optional = false)
-    @JoinColumn(name = "item_id")
-    private ItemEntity item;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "material_id")
+    private Set<ItemEntity> items = new HashSet<>();
 
     public MaterialEntity() {
     }
 
-    public MaterialEntity(int id, String name, int itemId) {
-        this.id = id;
-        this.name = name;
-        this.itemId = itemId;
+    public MaterialEntity(Material material) {
+        this.id = material.getId();
+        this.name = material.getName();
+
+        try {
+            ItemBuilder itemBuilder = new ItemBuilder();
+            this.items = itemBuilder.get(material.getItemIds().stream())
+                    .map(ItemEntity::new)
+                    .map(itemEntity -> itemEntity.setMaterial(this))
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public MaterialEntity setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public MaterialEntity setName(String name) {
         this.name = name;
+        return this;
     }
 
-    public int getItemId() {
-        return itemId;
+    public Set<ItemEntity> getItems() {
+        return items;
     }
 
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
+    public MaterialEntity setItems(Set<ItemEntity> items) {
+        this.items = items;
+        return this;
     }
 
-    public ItemEntity getItem() {
-        return item;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof final MaterialEntity that)) return false;
+        return that.getId() == getId();
     }
 
-    public void setItem(ItemEntity item) {
-        this.item = item;
-    }
-
-    public static List<MaterialEntity> buildEntities(Material material) {
-        return material.getItemIds()
-                .stream()
-                .map(itemId -> new MaterialEntity(material.getId(), material.getName(), itemId))
-                .collect(Collectors.toList());
+    @Override
+    public int hashCode() {
+        return ((Integer) getId()).hashCode();
     }
 }
