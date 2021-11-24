@@ -9,13 +9,18 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "materials")
 public class MaterialEntity {
+    @Column(nullable = false)
     private int id;
+
+    @Column(nullable = false)
     private String name;
+
     @Id
-    @Column(name = "item_id")
+    @Column(name = "item_id", nullable = false)
     private int itemId;
 
-    @OneToOne(mappedBy = "material")
+    @OneToOne
+    @JoinColumn(name = "item_id")
     private ItemEntity item;
 
     public MaterialEntity() {

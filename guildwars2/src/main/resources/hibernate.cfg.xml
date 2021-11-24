@@ -24,8 +24,5 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         <property name="highlight_sql">true</property>
-
-        <mapping class="com.senorpez.guildwars2.entity.ItemEntity"/>
-        <mapping class="com.senorpez.guildwars2.entity.MaterialEntity"/>
     </session-factory>
 </hibernate-configuration>

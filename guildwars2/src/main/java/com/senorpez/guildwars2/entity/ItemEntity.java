@@ -8,11 +8,13 @@ import javax.persistence.*;
 @Table(name = "items")
 public class ItemEntity {
     @Id
+    @Column(nullable = false)
     private int id;
+
+    @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "item")
-    @JoinColumn(name = "item_id")
+    @OneToOne(mappedBy = "item", optional = false)
     private MaterialEntity material;
 
     public ItemEntity() {
