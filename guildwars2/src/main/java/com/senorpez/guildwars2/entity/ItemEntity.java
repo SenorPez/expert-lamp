@@ -14,7 +14,7 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "item", optional = false)
+    @OneToOne(mappedBy = "item")
     private MaterialEntity material;
 
     public ItemEntity() {

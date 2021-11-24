@@ -19,7 +19,7 @@ public class MaterialEntity {
     @Column(name = "item_id", nullable = false)
     private int itemId;
 
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "item_id")
     private ItemEntity item;
 
