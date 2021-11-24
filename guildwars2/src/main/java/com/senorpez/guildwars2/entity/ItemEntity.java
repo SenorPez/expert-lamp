@@ -1,25 +1,21 @@
 package com.senorpez.guildwars2.entity;
 
 import com.senorpez.guildwars2.api.Item;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "items")
 public class ItemEntity {
+    @Id
     private int id;
     private String name;
 
-    public ItemEntity() {
+    @OneToOne(mappedBy = "item")
+    @JoinColumn(name = "item_id")
+    private MaterialEntity material;
 
+    public ItemEntity() {
     }
 
     public ItemEntity(Item item) {
@@ -27,7 +23,6 @@ public class ItemEntity {
         this.name = item.getName();
     }
 
-    @Id
     public int getId() {
         return id;
     }
@@ -42,5 +37,13 @@ public class ItemEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public MaterialEntity getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(MaterialEntity material) {
+        this.material = material;
     }
 }
