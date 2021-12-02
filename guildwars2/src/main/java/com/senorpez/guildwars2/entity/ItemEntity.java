@@ -75,13 +75,9 @@ public class ItemEntity {
         Stream<ItemEntity> itemEntities = builder.get()
                 .map(ItemEntity::new);
 
-        String hql = "FROM ItemEntity WHERE id IN :id";
-        TypedQuery<ItemEntity> query = session.createQuery(hql, ItemEntity.class);
-
         Transaction tx = session.beginTransaction();
         itemEntities.forEach(itemEntity -> {
-            query.setParameter("id", itemEntity.getId());
-            ItemEntity existing = query.getSingleResult();
+            ItemEntity existing = session.get(ItemEntity.class, itemEntity.getId());
             if (existing != null) itemEntity.setMaterial(existing.getMaterial());
             session.merge(itemEntity);
         });
