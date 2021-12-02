@@ -1,8 +1,13 @@
 package com.senorpez.guildwars2.entity;
 
 import com.senorpez.guildwars2.api.Item;
+import com.senorpez.guildwars2.api.ItemBuilder;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import javax.persistence.*;
+import java.io.IOException;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "items")
@@ -14,8 +19,8 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "material_id", updatable = false)
+    @ManyToOne
+    @JoinColumn(name = "material_id")
     private MaterialEntity material;
 
     public ItemEntity() {
@@ -63,5 +68,23 @@ public class ItemEntity {
     @Override
     public int hashCode() {
         return ((Integer) getId()).hashCode();
+    }
+
+    public static void updateAllItems(Session session) throws IOException {
+        ItemBuilder builder = new ItemBuilder();
+        Stream<ItemEntity> itemEntities = builder.get()
+                .map(ItemEntity::new);
+
+        String hql = "FROM ItemEntity WHERE id IN :id";
+        TypedQuery<ItemEntity> query = session.createQuery(hql, ItemEntity.class);
+
+        Transaction tx = session.beginTransaction();
+        itemEntities.forEach(itemEntity -> {
+            query.setParameter("id", itemEntity.getId());
+            ItemEntity existing = query.getSingleResult();
+            if (existing != null) itemEntity.setMaterial(existing.getMaterial());
+            session.merge(itemEntity);
+        });
+        tx.commit();
     }
 }
