@@ -64,6 +64,15 @@ public class ItemEntity {
         return this;
     }
 
+    public Set<PriceEntity> getPrices() {
+        return prices;
+    }
+
+    public ItemEntity setPrices(Set<PriceEntity> prices) {
+        this.prices = prices;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
