@@ -2,6 +2,7 @@ package com.senorpez.guildwars2;
 
 import com.senorpez.guildwars2.entity.ItemEntity;
 import com.senorpez.guildwars2.entity.MaterialEntity;
+import com.senorpez.guildwars2.entity.PriceEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -26,6 +27,7 @@ public class BuildSession {
         Metadata metadata = new MetadataSources(standardRegistry)
                 .addAnnotatedClass(ItemEntity.class)
                 .addAnnotatedClass(MaterialEntity.class)
+                .addAnnotatedClass(PriceEntity.class)
                 .getMetadataBuilder()
                 .build();
 

@@ -7,6 +7,8 @@ import org.hibernate.Transaction;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Entity
@@ -22,6 +24,10 @@ public class ItemEntity {
     @ManyToOne
     @JoinColumn(name = "material_id")
     private MaterialEntity material;
+
+    @OneToMany(mappedBy = "item")
+    private Set<PriceEntity> prices = new HashSet<>();
+
 
     public ItemEntity() {
     }

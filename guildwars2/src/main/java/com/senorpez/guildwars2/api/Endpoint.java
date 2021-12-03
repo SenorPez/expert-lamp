@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,8 +31,8 @@ public class Endpoint {
             String params = "?ids=" + chunk.map(Object::toString).collect(Collectors.joining(","));
             Stream.Builder<ObjectNode> builder = Stream.builder();
             try {
-                ArrayNode jsonArray = callAPI(params);
-                jsonArray.forEach(item -> builder.accept((ObjectNode) item));
+                Optional<ArrayNode> jsonArray = callAPI(params);
+                jsonArray.ifPresent(json -> json.forEach(item -> builder.accept((ObjectNode) item)));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -45,20 +46,23 @@ public class Endpoint {
     }
 
     private Stream<Integer> getAllIds() throws IOException {
-        ArrayNode ids = callAPI("");
+        Optional<ArrayNode> ids = callAPI("");
         Stream.Builder<Integer> integerBuilder = Stream.builder();
-        ids.forEach(node -> integerBuilder.accept(node.asInt()));
+        ids.ifPresent(jsonNodes -> jsonNodes
+                .forEach(node -> integerBuilder.accept(node.asInt())));
         return integerBuilder.build();
     }
 
-    private ArrayNode callAPI(String params) throws IOException {
+    private Optional<ArrayNode> callAPI(String params) throws IOException {
         URL url = new URL(protocol, host, resource + params);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
 
-        if (con.getResponseCode() == 200) {
+        if (con.getResponseCode() == 200 || con.getResponseCode() == 206) {
             ObjectMapper objectMapper = new ObjectMapper();
-            return (ArrayNode) objectMapper.readTree(con.getInputStream());
+            return Optional.of((ArrayNode) objectMapper.readTree(con.getInputStream()));
+        } else if (con.getResponseCode() == 404) {
+            return Optional.empty();
         } else {
             throw new IOException(String.valueOf(con.getResponseCode()));
         }
