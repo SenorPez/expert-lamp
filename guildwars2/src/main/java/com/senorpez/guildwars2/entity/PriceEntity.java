@@ -121,7 +121,7 @@ public class PriceEntity {
 
         prices.forEach(price -> {
             PriceEntity priceEntity = new PriceEntity(price, timestamp, session);
-            session.persist(priceEntity);
+            if (priceEntity.item != null) session.persist(priceEntity);
         });
         tx.commit();
     }

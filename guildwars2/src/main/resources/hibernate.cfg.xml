@@ -12,7 +12,7 @@
         <!-- Database connection settings -->
         <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="connection.url">jdbc:mysql://localhost:3306/expert_lamp?serverTimezone=UTC</property>
-        <property name="connection.username">expert_lamp</property>
+        <property name="connection.username">expert_lamp_user</property>
         <property name="connection.password">ENC(sNZ4YReEzY+XDhZZSejgnKu00Z0F7hpZ)</property>
 
         <!-- SQL dialect -->
