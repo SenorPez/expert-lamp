@@ -5,10 +5,7 @@ import com.senorpez.guildwars2.entity.PriceEntity;
 import org.hibernate.Session;
 
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Report {
     public static void main(String[] args) {
@@ -19,18 +16,50 @@ public class Report {
         Set<ItemEntity> items = new HashSet<>(query.getResultList());
 
         List<ReportLine> lines = new ArrayList<>();
-        items.forEach(item ->
-                lines.add(new ReportLine(item.getName(),
-                item.getPrices().stream().mapToInt(PriceEntity::getBuyPrice).average().orElse(0d),
-                item.getPrices().stream().mapToInt(PriceEntity::getSellPrice).average().orElse(0d))));
-        lines.sort((a, b) -> Double.compare(b.buyPrice, a.buyPrice));
+        Comparator<PriceEntity> byTimestamp = Comparator.comparingLong(PriceEntity::getTimestamp);
+        items.forEach(item -> item.getPrices().stream().max(byTimestamp)
+                .ifPresent(
+                        priceEntity -> lines.add(new ReportLine(item.getName(),
+                                priceEntity.getBuyPrice(),
+                                priceEntity.getSellPrice())
+                        )));
 
+        final double maxInvestment = 100000d;
+        final double products = 5d;
+        final double maxUnitPrice = maxInvestment / products / 250.0d;
+
+        Comparator<ReportLine> byRoi = Comparator.comparingDouble(ReportLine::getRoi).reversed();
         lines.stream()
+                .filter(item -> (item.getBuyPrice() != 0
+                        && item.getSellPrice() != 0
+                        && item.getRoi() > 0)
+                        && item.buyPrice <= maxUnitPrice)
+                .sorted(byRoi)
                 .limit(20)
-                .forEach(item -> System.out.print(item.getName() + " " + item.getBuyPrice() + " " + item.getSellPrice() + "\n"));
+                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
+                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
     }
 
-    private record ReportLine(String name, double buyPrice, double sellPrice) {
+    private static class ReportLine {
+        private final String name;
+        private final double buyPrice;
+        private final double sellPrice;
+
+        private final double profit;
+        private final double roi;
+
+        public ReportLine(String name, double buyPrice, double sellPrice) {
+            this.name = name;
+            this.buyPrice = buyPrice;
+            this.sellPrice = sellPrice;
+
+            this.profit = this.sellPrice
+                    - Math.max(1, Math.round(this.sellPrice * 0.05))
+                    - Math.max(1, Math.round(this.sellPrice * 0.1))
+                    - this.buyPrice;
+            this.roi = ((this.profit + this.buyPrice) / this.buyPrice - 1) * 100;
+        }
+
         public String getName() {
             return name;
         }
@@ -41,6 +70,14 @@ public class Report {
 
         public double getSellPrice() {
             return sellPrice;
+        }
+
+        public double getProfit() {
+            return profit;
+        }
+
+        public double getRoi() {
+            return roi;
         }
     }
 }
