@@ -23,3 +23,43 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+ext {
+    javaMainClass = 'com.senorpez.guildwars2.UpdateAllItems'
+}
+
+task updateItems(type: JavaExec) {
+    group = "Execution"
+    description = "Update materials from API"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.senorpez.guildwars2.UpdateAllItems'
+
+    systemProperties System.getProperties()
+}
+
+task updateMaterials(type: JavaExec) {
+    group = "Execution"
+    description = "Update materials from API"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.senorpez.guildwars2.UpdateAllMaterials'
+
+    systemProperties System.getProperties()
+}
+
+task getPrices(type: JavaExec) {
+    group = "Execution"
+    description = "Update materials from API"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.senorpez.guildwars2.GetPrices'
+
+    systemProperties System.getProperties()
+}
+
+task report(type: JavaExec) {
+    group = "Execution"
+    description = "Update materials from API"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.senorpez.guildwars2.Report'
+
+    systemProperties System.getProperties()
+}
