@@ -127,7 +127,6 @@ public class Endpoint {
         });
         CompletableFuture
                 .allOf(getRequests.toArray(new CompletableFuture[0]))
-                .thenRun(() -> System.out.println("Complete"))
                 .get();
 
         executor.shutdown();
@@ -135,7 +134,6 @@ public class Endpoint {
         Stream.Builder<ObjectNode> builder = Stream.builder();
         getRequests.forEach(item -> {
             try {
-                System.out.println(item);
                 item.get().forEach(builder);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

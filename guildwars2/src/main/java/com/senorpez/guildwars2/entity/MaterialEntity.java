@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -115,7 +116,6 @@ public class MaterialEntity {
 
     public static void updateAllMaterials(Session session) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         MaterialBuilder builder = new MaterialBuilder();
-        Transaction tx = session.beginTransaction();
         Stream<MaterialEntity> materialEntities = builder.get()
                 .map(material -> {
                     try {
@@ -125,7 +125,16 @@ public class MaterialEntity {
                     }
                     return null;
                 });
-        materialEntities.forEach(session::merge);
+
+        Transaction tx = session.beginTransaction();
+        AtomicInteger count = new AtomicInteger(0);
+        materialEntities.forEach(materialEntity -> {
+            session.merge(materialEntity);
+            if (count.incrementAndGet() % 50 == 0) {
+                session.flush();
+                session.clear();
+            }
+        });
         tx.commit();
     }
 }

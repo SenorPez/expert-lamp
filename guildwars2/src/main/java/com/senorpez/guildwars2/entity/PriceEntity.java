@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Entity
@@ -118,12 +119,17 @@ public class PriceEntity {
 
     public static void getPrices(long timestamp, Session session) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         PriceBuilder priceBuilder = new PriceBuilder();
-        Transaction tx = session.beginTransaction();
         Stream<Price> prices = priceBuilder.get();
 
+        Transaction tx = session.beginTransaction();
+        AtomicInteger count = new AtomicInteger(0);
         prices.forEach(price -> {
             PriceEntity priceEntity = new PriceEntity(price, timestamp, session);
             if (priceEntity.item != null) session.persist(priceEntity);
+            if (count.incrementAndGet() % 50 == 0) {
+                session.flush();
+                session.clear();
+            }
         });
         tx.commit();
     }
