@@ -125,11 +125,12 @@ public class Endpoint {
                     .thenApplyAsync(functionToJSON, executor);
             getRequests.add(completableFuture);
         });
-
         CompletableFuture
                 .allOf(getRequests.toArray(new CompletableFuture[0]))
                 .thenRun(() -> System.out.println("Complete"))
                 .get();
+
+        executor.shutdown();
 
         Stream.Builder<ObjectNode> builder = Stream.builder();
         getRequests.forEach(item -> {
