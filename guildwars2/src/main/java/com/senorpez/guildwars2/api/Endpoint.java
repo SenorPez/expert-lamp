@@ -17,9 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -117,13 +115,14 @@ public class Endpoint {
         final int totalPages = (int) response.headers().firstValueAsLong("X-Page-Total").orElse(0L);
 
         List<CompletableFuture<Stream<ObjectNode>>> getRequests = new ArrayList<>();
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
 
         IntStream.range(0, totalPages).forEach(pageNumber -> {
             CompletableFuture<Stream<ObjectNode>> completableFuture = CompletableFuture
                     .completedFuture(pageNumber)
-                    .thenApplyAsync(page -> functionGetResponse.apply(page, this.resource))
-                    .thenApplyAsync(functionGetResponseBody)
-                    .thenApplyAsync(functionToJSON);
+                    .thenApplyAsync(page -> functionGetResponse.apply(page, this.resource), executor)
+                    .thenApplyAsync(functionGetResponseBody, executor)
+                    .thenApplyAsync(functionToJSON, executor);
             getRequests.add(completableFuture);
         });
 
