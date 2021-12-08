@@ -7,6 +7,8 @@ import org.hibernate.Transaction;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 @Entity
@@ -114,7 +116,7 @@ public class PriceEntity {
         return getItem().hashCode() * ((Long) getTimestamp()).hashCode();
     }
 
-    public static void getPrices(long timestamp, Session session) throws IOException {
+    public static void getPrices(long timestamp, Session session) throws IOException, URISyntaxException, InterruptedException {
         PriceBuilder priceBuilder = new PriceBuilder();
         Transaction tx = session.beginTransaction();
         Stream<Price> prices = priceBuilder.get();

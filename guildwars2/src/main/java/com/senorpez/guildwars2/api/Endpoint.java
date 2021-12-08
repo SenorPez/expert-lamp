@@ -13,12 +13,15 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -100,7 +103,7 @@ public class Endpoint {
         return objectChunks.reduce(Stream::concat).orElseThrow(IOException::new);
     }
 
-    public void newGetAll() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+    public Stream<ObjectNode> getAll() throws InterruptedException, URISyntaxException, IOException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(protocol, host, resource, "page=0&page_size=200", null))
                 .GET()
@@ -124,27 +127,15 @@ public class Endpoint {
             getRequests.add(completableFuture);
         });
 
-        CompletableFuture
-                .allOf(getRequests.toArray(new CompletableFuture[0]))
-                .thenRun(() -> System.out.println("All done"))
-                .get();
-    }
-
-    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException, ExecutionException {
-        Endpoint endpoint = new Endpoint("/v2/items");
-        endpoint.newGetAll();
-    }
-
-    public Stream<ObjectNode> getAll() throws IOException {
-        return getMultiple(getAllIds());
-    }
-
-    private Stream<Integer> getAllIds() throws IOException {
-        Optional<ArrayNode> ids = callAPI("");
-        Stream.Builder<Integer> integerBuilder = Stream.builder();
-        ids.ifPresent(jsonNodes -> jsonNodes
-                .forEach(node -> integerBuilder.accept(node.asInt())));
-        return integerBuilder.build();
+        Stream.Builder<ObjectNode> builder = Stream.builder();
+        getRequests.forEach(item -> {
+            try {
+                item.get().forEach(builder);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+        return builder.build();
     }
 
     private Optional<ArrayNode> callAPI(String params) throws IOException {

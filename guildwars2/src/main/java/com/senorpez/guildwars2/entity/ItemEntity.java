@@ -7,8 +7,10 @@ import org.hibernate.Transaction;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 @Entity
@@ -85,7 +87,7 @@ public class ItemEntity {
         return ((Integer) getId()).hashCode();
     }
 
-    public static void updateAllItems(Session session) throws IOException {
+    public static void updateAllItems(Session session) throws IOException, URISyntaxException, InterruptedException {
         ItemBuilder builder = new ItemBuilder();
         Stream<ItemEntity> itemEntities = builder.get()
                 .map(ItemEntity::new);

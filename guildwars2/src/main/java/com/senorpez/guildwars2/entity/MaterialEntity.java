@@ -8,8 +8,10 @@ import org.hibernate.Transaction;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,7 +113,7 @@ public class MaterialEntity {
         return e;
     }
 
-    public static void updateAllMaterials(Session session) throws IOException {
+    public static void updateAllMaterials(Session session) throws IOException, URISyntaxException, InterruptedException {
         MaterialBuilder builder = new MaterialBuilder();
         Transaction tx = session.beginTransaction();
         Stream<MaterialEntity> materialEntities = builder.get()

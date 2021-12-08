@@ -3,6 +3,8 @@ package com.senorpez.guildwars2.api;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -25,7 +27,7 @@ abstract public class APIObjectBuilder<T> {
         return creator.apply(json);
     }
 
-    public Stream<T> get() throws IOException {
+    public Stream<T> get() throws IOException, URISyntaxException, InterruptedException {
         Stream<ObjectNode> json = endpoint.getAll();
         return creator.apply(json);
     }
