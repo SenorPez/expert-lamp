@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Entity
@@ -93,10 +94,15 @@ public class ItemEntity {
                 .map(ItemEntity::new);
 
         Transaction tx = session.beginTransaction();
+        AtomicInteger count = new AtomicInteger(0);
         itemEntities.forEach(itemEntity -> {
             ItemEntity existing = session.get(ItemEntity.class, itemEntity.getId());
             if (existing != null) itemEntity.setMaterial(existing.getMaterial());
             session.merge(itemEntity);
+            if (count.incrementAndGet() % 50 == 0) {
+                session.flush();
+                session.clear();
+            }
         });
         tx.commit();
     }
