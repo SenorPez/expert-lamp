@@ -113,7 +113,7 @@ public class MaterialEntity {
         return e;
     }
 
-    public static void updateAllMaterials(Session session) throws IOException, URISyntaxException, InterruptedException {
+    public static void updateAllMaterials(Session session) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         MaterialBuilder builder = new MaterialBuilder();
         Transaction tx = session.beginTransaction();
         Stream<MaterialEntity> materialEntities = builder.get()

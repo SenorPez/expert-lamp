@@ -101,7 +101,7 @@ public class Endpoint {
         return objectChunks.reduce(Stream::concat).orElseThrow(IOException::new);
     }
 
-    public Stream<ObjectNode> getAll() throws InterruptedException, URISyntaxException, IOException {
+    public Stream<ObjectNode> getAll() throws InterruptedException, URISyntaxException, IOException, ExecutionException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(protocol, host, resource, "page=0&page_size=200", null))
                 .GET()
@@ -115,7 +115,7 @@ public class Endpoint {
         final int totalPages = (int) response.headers().firstValueAsLong("X-Page-Total").orElse(0L);
 
         List<CompletableFuture<Stream<ObjectNode>>> getRequests = new ArrayList<>();
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(30);
 
         IntStream.range(0, totalPages).forEach(pageNumber -> {
             CompletableFuture<Stream<ObjectNode>> completableFuture = CompletableFuture
@@ -126,9 +126,15 @@ public class Endpoint {
             getRequests.add(completableFuture);
         });
 
+        CompletableFuture
+                .allOf(getRequests.toArray(new CompletableFuture[0]))
+                .thenRun(() -> System.out.println("Complete"))
+                .get();
+
         Stream.Builder<ObjectNode> builder = Stream.builder();
         getRequests.forEach(item -> {
             try {
+                System.out.println(item);
                 item.get().forEach(builder);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

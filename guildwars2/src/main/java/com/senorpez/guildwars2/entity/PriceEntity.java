@@ -116,7 +116,7 @@ public class PriceEntity {
         return getItem().hashCode() * ((Long) getTimestamp()).hashCode();
     }
 
-    public static void getPrices(long timestamp, Session session) throws IOException, URISyntaxException, InterruptedException {
+    public static void getPrices(long timestamp, Session session) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         PriceBuilder priceBuilder = new PriceBuilder();
         Transaction tx = session.beginTransaction();
         Stream<Price> prices = priceBuilder.get();

@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 public class UpdateAllMaterials {
-    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         Session session = BuildSession.build();
         MaterialEntity.updateAllMaterials(session);
         session.close();

@@ -87,7 +87,7 @@ public class ItemEntity {
         return ((Integer) getId()).hashCode();
     }
 
-    public static void updateAllItems(Session session) throws IOException, URISyntaxException, InterruptedException {
+    public static void updateAllItems(Session session) throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         ItemBuilder builder = new ItemBuilder();
         Stream<ItemEntity> itemEntities = builder.get()
                 .map(ItemEntity::new);
