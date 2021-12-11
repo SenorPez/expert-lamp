@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import javax.persistence.TypedQuery;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Report {
     public static void main(String[] args) {
@@ -15,21 +16,62 @@ public class Report {
         TypedQuery<ItemEntity> query = session.createQuery(hql, ItemEntity.class);
         Set<ItemEntity> items = new HashSet<>(query.getResultList());
 
-        List<ReportLine> lines = new ArrayList<>();
-        Comparator<PriceEntity> byTimestamp = Comparator.comparingLong(PriceEntity::getTimestamp);
-        items.forEach(item -> item.getPrices().stream().max(byTimestamp)
-                .ifPresent(
-                        priceEntity -> lines.add(new ReportLine(item.getName(),
-                                priceEntity.getBuyPrice(),
-                                priceEntity.getSellPrice())
-                        )));
+        long currentTimeMillis = System.currentTimeMillis();
+        List<ReportLine> lastDay = new ArrayList<>();
+        List<ReportLine> lastWeek = new ArrayList<>();
+        List<ReportLine> lastMonth = new ArrayList<>();
+
+        items.forEach(item -> lastDay.add(new ReportLine(
+                item.getName(),
+                item.getPrices()
+                        .stream()
+                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L)
+                        .collect(Collectors.toList()))));
+        items.forEach(item -> lastWeek.add(new ReportLine(
+                item.getName(),
+                item.getPrices()
+                        .stream()
+                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L * 7)
+                        .collect(Collectors.toList()))));
+        items.forEach(item -> lastMonth.add(new ReportLine(
+                item.getName(),
+                item.getPrices()
+                        .stream()
+                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L * 30)
+                        .collect(Collectors.toList()))));
 
         final double maxInvestment = 100000d;
         final double products = 5d;
         final double maxUnitPrice = maxInvestment / products / 250.0d;
 
         Comparator<ReportLine> byRoi = Comparator.comparingDouble(ReportLine::getRoi).reversed();
-        lines.stream()
+        System.out.println("1-Day Averages:\n");
+        System.out.println("---------------\n");
+        lastDay.stream()
+                .filter(item -> (item.getBuyPrice() != 0
+                        && item.getSellPrice() != 0
+                        && item.getRoi() > 0)
+                        && item.buyPrice <= maxUnitPrice)
+                .sorted(byRoi)
+                .limit(20)
+                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
+                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
+
+        System.out.println("7-Day Averages:\n");
+        System.out.println("---------------\n");
+        lastWeek.stream()
+                .filter(item -> (item.getBuyPrice() != 0
+                        && item.getSellPrice() != 0
+                        && item.getRoi() > 0)
+                        && item.buyPrice <= maxUnitPrice)
+                .sorted(byRoi)
+                .limit(20)
+                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
+                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
+
+        System.out.println("30-Day Averages:\n");
+        System.out.println("----------------\n");
+        lastDay.stream()
                 .filter(item -> (item.getBuyPrice() != 0
                         && item.getSellPrice() != 0
                         && item.getRoi() > 0)
@@ -58,6 +100,14 @@ public class Report {
                     - Math.max(1, Math.round(this.sellPrice * 0.1))
                     - this.buyPrice;
             this.roi = ((this.profit + this.buyPrice) / this.buyPrice - 1) * 100;
+        }
+
+        public ReportLine(String name, List<PriceEntity> priceEntities) {
+            this(
+                    name,
+                    priceEntities.stream().mapToInt(PriceEntity::getBuyPrice).average().orElse(0),
+                    priceEntities.stream().mapToInt(PriceEntity::getSellPrice).average().orElse(0)
+            );
         }
 
         public String getName() {
