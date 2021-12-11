@@ -45,8 +45,8 @@ public class Report {
         final double maxUnitPrice = maxInvestment / products / 250.0d;
 
         Comparator<ReportLine> byRoi = Comparator.comparingDouble(ReportLine::getRoi).reversed();
-        System.out.println("1-Day Averages:\n");
-        System.out.println("---------------\n");
+        System.out.println("1-Day Averages:");
+        System.out.println("---------------");
         lastDay.stream()
                 .filter(item -> (item.getBuyPrice() != 0
                         && item.getSellPrice() != 0
@@ -57,8 +57,8 @@ public class Report {
                 .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
                         item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
 
-        System.out.println("7-Day Averages:\n");
-        System.out.println("---------------\n");
+        System.out.println("\n7-Day Averages:");
+        System.out.println("---------------");
         lastWeek.stream()
                 .filter(item -> (item.getBuyPrice() != 0
                         && item.getSellPrice() != 0
@@ -69,8 +69,8 @@ public class Report {
                 .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
                         item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
 
-        System.out.println("30-Day Averages:\n");
-        System.out.println("----------------\n");
+        System.out.println("\n30-Day Averages:");
+        System.out.println("----------------");
         lastDay.stream()
                 .filter(item -> (item.getBuyPrice() != 0
                         && item.getSellPrice() != 0
