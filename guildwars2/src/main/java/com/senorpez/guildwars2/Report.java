@@ -54,8 +54,8 @@ public class Report {
                         && item.buyPrice <= maxUnitPrice)
                 .sorted(byRoi)
                 .limit(20)
-                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
-                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
+                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
+                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
 
         System.out.println("\n7-Day Averages:");
         System.out.println("---------------");
@@ -66,8 +66,8 @@ public class Report {
                         && item.buyPrice <= maxUnitPrice)
                 .sorted(byRoi)
                 .limit(20)
-                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
-                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
+                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
+                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
 
         System.out.println("\n30-Day Averages:");
         System.out.println("----------------");
@@ -78,8 +78,8 @@ public class Report {
                         && item.buyPrice <= maxUnitPrice)
                 .sorted(byRoi)
                 .limit(20)
-                .forEach(item -> System.out.printf("%40s   %10d   %10d   %7.2f   %6.2f%%\n",
-                        item.getName(), (int) item.getBuyPrice(), (int) item.getSellPrice(), item.getProfit(), item.getRoi()));
+                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
+                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
     }
 
     private static class ReportLine {
