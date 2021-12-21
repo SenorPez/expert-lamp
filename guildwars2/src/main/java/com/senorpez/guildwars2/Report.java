@@ -5,81 +5,111 @@ import com.senorpez.guildwars2.entity.PriceEntity;
 import org.hibernate.Session;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class Report {
+    private static final List<ReportLine> lastDay = new ArrayList<>();
+    private static final List<ReportLine> lastWeek = new ArrayList<>();
+    private static final List<ReportLine> lastMonth = new ArrayList<>();
+
+    private static final BiPredicate<PriceEntity, Long> within1Day = (p, t) -> p.getTimestamp() > t - 86400 * 1000L;
+    private static final BiPredicate<PriceEntity, Long> within7Days = (p, t) -> p.getTimestamp() > t - 86400 * 1000L * 7;
+    private static final BiPredicate<PriceEntity, Long> within30Days = (p, t) -> p.getTimestamp() > t - 86400 * 1000L * 30;
+
+    private static final Comparator<ReportLine> byRoi = Comparator.comparingDouble(ReportLine::getRoi).reversed();
+    private static final double maxInvestment = 100000d;
+    private static final double products = 5d;
+    private static final double maxUnitPrice = maxInvestment / products / 250.0d;
+
     public static void main(String[] args) {
         Session session = BuildSession.build();
 
-        String hql = "FROM ItemEntity WHERE material IS NOT NULL";
-        TypedQuery<ItemEntity> query = session.createQuery(hql, ItemEntity.class);
-        Set<ItemEntity> items = new HashSet<>(query.getResultList());
+        int pageNumber = 1;
+        final int pageSize = 10;
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        countQuery.select(cb.count(countQuery.from(ItemEntity.class)));
+        Long count = session.createQuery(countQuery).getSingleResult();
+
+        CriteriaQuery<ItemEntity> itemQuery = cb.createQuery(ItemEntity.class);
+        Root<ItemEntity> from = itemQuery.from(ItemEntity.class);
+        CriteriaQuery<ItemEntity> select = itemQuery.select(from);
+        TypedQuery<ItemEntity> query = session.createQuery(select);
 
         long currentTimeMillis = System.currentTimeMillis();
-        List<ReportLine> lastDay = new ArrayList<>();
-        List<ReportLine> lastWeek = new ArrayList<>();
-        List<ReportLine> lastMonth = new ArrayList<>();
+        while (pageNumber < count.intValue()) {
+            query.setFirstResult(pageNumber - 1);
+            query.setMaxResults(pageSize);
+            Set<ItemEntity> items = new HashSet<>(query.getResultList());
+            addLastDayPrices(items, currentTimeMillis);
+            addLastWeekPrices(items, currentTimeMillis);
+            addLastMonthPrices(items, currentTimeMillis);
+            session.clear();
+            pageNumber += pageSize;
+        }
 
-        items.forEach(item -> lastDay.add(new ReportLine(
+        printLastDayPrices();
+        System.out.println();
+        printLastWeekPrices();
+        System.out.println();
+        printLastMonthPrices();
+    }
+
+    public static void addPrices(Set<ItemEntity> items, long currentTimeMillis, List<ReportLine> collection, BiPredicate<PriceEntity, Long> within) {
+        items.forEach(item -> collection.add(new ReportLine(
                 item.getName(),
                 item.getPrices()
                         .stream()
-                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L)
-                        .collect(Collectors.toList()))));
-        items.forEach(item -> lastWeek.add(new ReportLine(
-                item.getName(),
-                item.getPrices()
-                        .stream()
-                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L * 7)
-                        .collect(Collectors.toList()))));
-        items.forEach(item -> lastMonth.add(new ReportLine(
-                item.getName(),
-                item.getPrices()
-                        .stream()
-                        .filter(price -> price.getTimestamp() > currentTimeMillis - 86400 * 1000L * 30)
-                        .collect(Collectors.toList()))));
+                        .filter(p -> within.test(p, currentTimeMillis))
+                        .collect(Collectors.toList())
+        )));
+    }
 
-        final double maxInvestment = 100000d;
-        final double products = 5d;
-        final double maxUnitPrice = maxInvestment / products / 250.0d;
+    private static void addLastDayPrices(Set<ItemEntity> items, long currentTimeMillis) {
+        addPrices(items, currentTimeMillis, lastDay, within1Day);
+    }
 
-        Comparator<ReportLine> byRoi = Comparator.comparingDouble(ReportLine::getRoi).reversed();
+    private static void addLastWeekPrices(Set<ItemEntity> items, long currentTimeMillis) {
+        addPrices(items, currentTimeMillis, lastWeek, within7Days);
+    }
+
+    private static void addLastMonthPrices(Set<ItemEntity> items, long currentTimeMillis) {
+        addPrices(items, currentTimeMillis, lastMonth, within30Days);
+    }
+
+    private static void printPrices(List<ReportLine> collection) {
+        System.out.println("---------------");
+        collection.stream()
+                .filter(item -> (
+                        item.getBuyPrice() != 0
+                                && item.getSellPrice() != 0
+                                && item.getRoi() > 0)
+                        && item.getBuyPrice() < maxUnitPrice)
+                .sorted(byRoi)
+                .limit(20)
+                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
+                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
+    }
+
+    private static void printLastDayPrices() {
         System.out.println("1-Day Averages:");
-        System.out.println("---------------");
-        lastDay.stream()
-                .filter(item -> (item.getBuyPrice() != 0
-                        && item.getSellPrice() != 0
-                        && item.getRoi() > 0)
-                        && item.buyPrice <= maxUnitPrice)
-                .sorted(byRoi)
-                .limit(20)
-                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
-                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
+        printPrices(lastDay);
+    }
 
-        System.out.println("\n7-Day Averages:");
-        System.out.println("---------------");
-        lastWeek.stream()
-                .filter(item -> (item.getBuyPrice() != 0
-                        && item.getSellPrice() != 0
-                        && item.getRoi() > 0)
-                        && item.buyPrice <= maxUnitPrice)
-                .sorted(byRoi)
-                .limit(20)
-                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
-                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
+    private static void printLastWeekPrices() {
+        System.out.println("7-Day Averages:");
+        printPrices(lastWeek);
+    }
 
-        System.out.println("\n30-Day Averages:");
-        System.out.println("----------------");
-        lastDay.stream()
-                .filter(item -> (item.getBuyPrice() != 0
-                        && item.getSellPrice() != 0
-                        && item.getRoi() > 0)
-                        && item.buyPrice <= maxUnitPrice)
-                .sorted(byRoi)
-                .limit(20)
-                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
-                        item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
+    private static void printLastMonthPrices() {
+        System.out.println("30-Day Averages");
+        printPrices(lastMonth);
     }
 
     private static class ReportLine {
