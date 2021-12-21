@@ -39,7 +39,10 @@ public class Report {
 
         CriteriaQuery<ItemEntity> itemQuery = cb.createQuery(ItemEntity.class);
         Root<ItemEntity> from = itemQuery.from(ItemEntity.class);
-        CriteriaQuery<ItemEntity> select = itemQuery.select(from);
+        CriteriaQuery<ItemEntity> select =
+                System.getProperty("crafting") == null ?
+                        itemQuery.select(from) :
+                        itemQuery.select(from).where(cb.isNotNull(from.get("material")));
         TypedQuery<ItemEntity> query = session.createQuery(select);
 
         long currentTimeMillis = System.currentTimeMillis();
