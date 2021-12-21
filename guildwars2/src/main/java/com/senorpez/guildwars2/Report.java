@@ -93,7 +93,7 @@ public class Report {
                         && item.getBuyPrice() < maxUnitPrice)
                 .sorted(byRoi)
                 .limit(20)
-                .forEach(item -> System.out.printf("%40s   %7.2f   %7.2f  %7.2f   %6.2f%%\n",
+                .forEach(item -> System.out.printf("%40s  %10.2f  %10.2f  %10.2f  %9.2f%%\n",
                         item.getName(), item.getBuyPrice(), item.getSellPrice(), item.getProfit(), item.getRoi()));
     }
 
