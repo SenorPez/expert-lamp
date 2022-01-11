@@ -67,6 +67,7 @@ public class Report {
     public static void addPrices(Set<ItemEntity> items, long currentTimeMillis, List<ReportLine> collection, BiPredicate<PriceEntity, Long> within) {
         items.forEach(item -> collection.add(new ReportLine(
                 item.getName(),
+                item.getVendorValue(),
                 item.getPrices()
                         .stream()
                         .filter(p -> within.test(p, currentTimeMillis))
@@ -123,9 +124,12 @@ public class Report {
         private final double profit;
         private final double roi;
 
-        public ReportLine(String name, double buyPrice, double sellPrice) {
+        public ReportLine(String name, int vendorValue, double buyPrice, double sellPrice) {
             this.name = name;
-            this.buyPrice = buyPrice;
+
+            long minBuyPrice = vendorValue + Math.max(1, Math.round(vendorValue * 0.15));
+
+            this.buyPrice = Math.max(minBuyPrice, buyPrice);
             this.sellPrice = sellPrice;
 
             this.profit = this.sellPrice
@@ -135,9 +139,10 @@ public class Report {
             this.roi = ((this.profit + this.buyPrice) / this.buyPrice - 1) * 100;
         }
 
-        public ReportLine(String name, List<PriceEntity> priceEntities) {
+        public ReportLine(String name, int vendorValue, List<PriceEntity> priceEntities) {
             this(
                     name,
+                    vendorValue,
                     priceEntities.stream().mapToInt(PriceEntity::getBuyPrice).average().orElse(0),
                     priceEntities.stream().mapToInt(PriceEntity::getSellPrice).average().orElse(0)
             );

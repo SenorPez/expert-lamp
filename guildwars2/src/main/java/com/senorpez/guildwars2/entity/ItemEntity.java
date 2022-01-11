@@ -24,13 +24,15 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private int vendorValue;
+
     @ManyToOne
     @JoinColumn(name = "material_id")
     private MaterialEntity material;
 
     @OneToMany(mappedBy = "item")
     private Set<PriceEntity> prices = new HashSet<>();
-
 
     public ItemEntity() {
     }
@@ -55,6 +57,15 @@ public class ItemEntity {
 
     public ItemEntity setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public int getVendorValue() {
+        return vendorValue;
+    }
+
+    public ItemEntity setVendorValue(int vendorValue) {
+        this.vendorValue = vendorValue;
         return this;
     }
 
