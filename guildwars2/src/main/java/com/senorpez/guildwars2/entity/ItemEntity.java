@@ -24,7 +24,7 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "vendor_value", nullable = false)
     private int vendorValue;
 
     @ManyToOne
