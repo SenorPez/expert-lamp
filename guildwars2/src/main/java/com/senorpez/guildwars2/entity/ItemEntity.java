@@ -40,6 +40,7 @@ public class ItemEntity {
     public ItemEntity(Item item) {
         this.id = item.getId();
         this.name = item.getName();
+        this.vendorValue = item.getVendorValue();
     }
 
     public int getId() {
