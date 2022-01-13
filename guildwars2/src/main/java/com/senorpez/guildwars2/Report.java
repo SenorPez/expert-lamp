@@ -1,6 +1,7 @@
 package com.senorpez.guildwars2;
 
 import com.senorpez.guildwars2.entity.ItemEntity;
+import com.senorpez.guildwars2.entity.ItemFlag;
 import com.senorpez.guildwars2.entity.PriceEntity;
 import org.hibernate.Session;
 
@@ -65,14 +66,17 @@ public class Report {
     }
 
     public static void addPrices(Set<ItemEntity> items, long currentTimeMillis, List<ReportLine> collection, BiPredicate<PriceEntity, Long> within) {
-        items.forEach(item -> collection.add(new ReportLine(
-                item.getName(),
-                item.getVendorValue(),
-                item.getPrices()
-                        .stream()
-                        .filter(p -> within.test(p, currentTimeMillis))
-                        .collect(Collectors.toList())
-        )));
+        items
+                .stream()
+                .filter(item -> !item.getItemFlags().contains(ItemFlag.NO_SELL))
+                .forEach(item -> collection.add(new ReportLine(
+                        item.getName(),
+                        item.getVendorValue(),
+                        item.getPrices()
+                                .stream()
+                                .filter(p -> within.test(p, currentTimeMillis))
+                                .collect(Collectors.toList())
+                )));
     }
 
     private static void addLastDayPrices(Set<ItemEntity> items, long currentTimeMillis) {

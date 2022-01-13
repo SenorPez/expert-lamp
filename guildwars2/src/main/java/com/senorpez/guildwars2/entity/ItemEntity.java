@@ -8,10 +8,12 @@ import org.hibernate.Transaction;
 import javax.persistence.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Entity
@@ -27,6 +29,9 @@ public class ItemEntity {
     @Column(name = "vendor_value", nullable = false)
     private int vendorValue;
 
+    @Column
+    private Integer flags;
+
     @ManyToOne
     @JoinColumn(name = "material_id")
     private MaterialEntity material;
@@ -41,6 +46,9 @@ public class ItemEntity {
         this.id = item.getId();
         this.name = item.getName();
         this.vendorValue = item.getVendorValue();
+
+        this.flags = 0;
+        item.getFlags().forEach(flag -> this.flags += (int) Math.pow(2, ItemFlag.findByString(flag).ordinal()));
     }
 
     public int getId() {
@@ -68,6 +76,21 @@ public class ItemEntity {
     public ItemEntity setVendorValue(int vendorValue) {
         this.vendorValue = vendorValue;
         return this;
+    }
+
+    public Integer getFlags() {
+        return flags;
+    }
+
+    public ItemEntity setFlags(Integer flags) {
+        this.flags = flags;
+        return this;
+    }
+
+    public Set<ItemFlag> getItemFlags() {
+        return Arrays.stream(ItemFlag.values())
+                .filter(itemFlag -> (flags & (int) Math.pow(2, itemFlag.ordinal())) == Math.pow(2, itemFlag.ordinal()))
+                .collect(Collectors.toSet());
     }
 
     public MaterialEntity getMaterial() {
